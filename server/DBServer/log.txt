@@ -1,0 +1,4 @@
+2022-10-25 17:31:32,375 INFO django.utils.autoreload C:\programming\Tailwind-NextJS-Flask\server\DBServer\database\views.py changed, reloading.
+2022-10-25 17:31:37,926 INFO django.utils.autoreload C:\programming\Tailwind-NextJS-Flask\server\DBServer\database\views.py changed, reloading.
+2022-10-25 17:31:43,429 INFO django.utils.autoreload C:\programming\Tailwind-NextJS-Flask\server\DBServer\database\views.py changed, reloading.
+2022-10-25 17:32:37,735 INFO django.utils.autoreload C:\programming\Tailwind-NextJS-Flask\server\DBServer\database\views.py changed, reloading.
