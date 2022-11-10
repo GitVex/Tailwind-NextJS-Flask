@@ -35,8 +35,8 @@ function Linkspace(setMethod) {
                     <input id="query" type="text" placeholder='Add your track to help other Dungeon Masters!' className='w-[42em] font-mono font-extralight text-navy-sierra-100 bg-darknavy-800 border-[3px] p-1 rounded-xl border-darknavy-700' name="query" />
                     {searching &&
                         (<div className='flex flex-row justify-center'>
-                            <div className="animate-spin rounded-full h-8 w-8 border-navy-sierra-100">
-                                <svg className="h-8 w-8 stroke-navy-sierra-200" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <div className="animate-spin rounded-full h-8 w-8">
+                                <svg className="h-8 w-8 text-navy-sierra-100" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M12 2V6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                                     <path d="M12 18V22" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                                     <path d="M4.93 4.93L7.76 7.76" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />

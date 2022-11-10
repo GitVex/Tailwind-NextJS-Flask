@@ -15,7 +15,7 @@ function Browser(prop) {
     return (
         <div className='mx-20 flex flex-col gap-1 justify-start'>
             {data.map((item) => 
-                <BrowserContainer trackData={JSON.stringify(item)}/>)
+                <BrowserContainer trackData={item}/>)
             }
         </div>)
 }

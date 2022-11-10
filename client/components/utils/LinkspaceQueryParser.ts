@@ -1,9 +1,29 @@
 // Language: typescript
 
+interface VidData {
+    target: string;
+    title: string;
+    artist: string;
+    description: string;
+    thumbnail: {
+        url: string;
+        width: number;
+        height: number;
+    },
+    url: string;
+    duration: string;
+}
+
+interface ValidatedQuery {
+    target: string;
+    url: string;
+    fetched?: any;
+}
+
 // validate a given query string and mark it with the appropriate target
 // a string is valid if it is a valid url to a soundcloud, youtube, spotify or a phrase
 // a phrase is valid if it is a string of characters that is not a url
-function validateQuery(query) {
+function validateQuery(query): ValidatedQuery {
 
     var url = new URL("https://placeholder.com")
 
@@ -27,22 +47,26 @@ function validateQuery(query) {
 
 // after validating the query string, query the appropriate api and return the result
 // if the query is a phrase, return the 10 best results from all three apis
-export async function queryAPIs(query) {
+function queryAPIs(query) {
+
     const validatedQuery = validateQuery(query)
+
+    console.log(validatedQuery)
+
     if (validatedQuery.target === "soundcloud") {
-        return await querySoundcloud(validatedQuery.url)
+        return querySoundcloud(validatedQuery)
     } else if (validatedQuery.target === "spotify") {
-        return await querySpotify(validatedQuery.url)
+        return querySpotify(validatedQuery)
     } else if (validatedQuery.target === "youtube") {
-        return await queryYoutube(validatedQuery.url)
+        return queryYoutube(validatedQuery)
     } else if (validatedQuery.target === "phrase") {
-        return await queryPhrase(validatedQuery.url)
+        return queryPhrase(validatedQuery)
     }
 }
 
 // query phrase, fetching results from all three apis and returning the 10 best results
-async function queryPhrase(query) {
-    const youtubeResults = await searchYoutube(query)
+function queryPhrase(query: ValidatedQuery) {
+    const youtubeResults = searchYoutube(query)
     // const soundcloudResults = await loadInterface(searchSoundcloud(query))
     // const spotifyResults = await loadInterface(searchSpotify(query))
     const results = youtubeResults // .concat(soundcloudResults, spotifyResults)
@@ -66,21 +90,20 @@ async function fetchYoutube(id) {
 }
 
 // search youtube with a given query and return the first 10 results and no channels
-async function searchYoutube(query) {
+async function searchYoutube(query: ValidatedQuery) {
     const searchRes = await fetch(
         `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=10&q=${query}&type=video&key=${process.env.NEXT_PUBLIC_YOUTUBE_API_KEY}`
     )
     const searched = await searchRes.json()
 
-    console.log(searched)
-
     //TODO load search results into interface
     for (let i = 0; i < searched.items.length; i++) {
         // fetch all data for each video with the fetchYoutube function
         const fetched = await fetchYoutube(searched.items[i].id.videoId)
-        console.log(fetched)
+        query.fetched = fetched
+        query.target = "youtube"
         // load the fetched data into the interface
-        searched.items[i] = loadInterface(fetched)
+        searched.items[i] = loadInterface(query)
 
         // searched.items[i] = loadInterface(searched.items[i])
     }
@@ -89,7 +112,7 @@ async function searchYoutube(query) {
 }
 
 //search soundcloud with a given query and return the first 10 results
-async function searchSoundcloud(query) {
+async function searchSoundcloud(query: ValidatedQuery) {
     const res = await fetch(
         "https://api.soundcloud.com/tracks?client_id=2t9loNQH90kzJcsFCODdigxfp325aq4z&q=" + query //+ process.env.SOUNDCLOUD_API_KEY
     )
@@ -98,7 +121,7 @@ async function searchSoundcloud(query) {
 }
 
 // search spotify with a given query and return the first 10 results
-async function searchSpotify(query) {
+async function searchSpotify(query: ValidatedQuery) {
     const res = await fetch(
         "https://api.spotify.com/v1/search?q=" + query + "&type=track&limit=10",
         {
@@ -112,9 +135,10 @@ async function searchSpotify(query) {
 }
 
 // query youtube
-async function queryYoutube(url) {
+async function queryYoutube(query: ValidatedQuery) {
 
-    var videoId = url.split("v=")[1]
+    var videoId = query.url.split("v=")[1]
+
     const ampersandPosition = videoId.indexOf("&")
     if (ampersandPosition !== -1) {
         videoId = videoId.substring(0, ampersandPosition)
@@ -123,6 +147,7 @@ async function queryYoutube(url) {
     const snippet = await fetch(
         `https://www.googleapis.com/youtube/v3/videos?part=snippet&id=${videoId}&key=${process.env.NEXT_PUBLIC_YOUTUBE_API_KEY}`
     )
+
     const jsonSnippet = await snippet.json()
 
     const cDetails = await fetch(
@@ -135,25 +160,32 @@ async function queryYoutube(url) {
         contentDetails: jsonCDetails.items[0].contentDetails
     }
 
+    query.target = "youtube"
+    query.fetched = json
+
     console.log(json)
 
     // TODO load video data into interface
-    return [await loadInterface(json)]
+    return [await loadInterface(query)]
 }
 
 // query soundcloud
-async function querySoundcloud(url) {
+async function querySoundcloud(query: ValidatedQuery) {
     const res = await fetch(
         "https://api.soundcloud.com/resolve?url=" +
         url +
         "&client_id=2t9loNQH90kzJcsFCODdigxfp325aq4z" //+ process.env.SOUNDCLOUD_API_KEY
     )
     const json = await res.json()
-    return json
+
+    query.target = "soundcloud"
+    query.fetched = json
+
+    return query
 }
 
 // query spotify
-async function querySpotify(url) {
+async function querySpotify(query: ValidatedQuery) {
     const res = await fetch(
         "https://api.spotify.com/v1/tracks/" + url.split("/")[4],
         {
@@ -163,70 +195,72 @@ async function querySpotify(url) {
         }
     )
     const json = await res.json()
-    return json
+
+    query.target = "spotify"
+    query.fetched = json
+
+    return query
 }
 
 // create an interface for the three apis' return values with debug console logs
 // pass the width and height of the thumbnail in a JSON with the thumbnail url
 // recognise the api by the value of the target key
-function loadInterface(data) {
+function loadInterface(query: ValidatedQuery): VidData {
 
-    if (data.target === "youtube") {
-        return {
+    const data = query.fetched
+    console.log(query.target)
+
+    if (query.target === "youtube") {
+        const ret_val: VidData = {
             target: "youtube",
             title: data.snippet.title,
             artist: data.snippet.channelTitle,
             description: data.snippet.description,
             thumbnail: {
                 url: data.snippet.thumbnails.high.url,
-                width: data.snippet.thumbnails.high.width / 2,
-                height: data.snippet.thumbnails.high.height / 2,
+                width: data.snippet.thumbnails.high.width, // / 2
+                height: data.snippet.thumbnails.high.height, // / 2
             },
             url: "https://www.youtube.com/watch?v=" + data.id,
             // convert the duration from ISO 8601 to readable minutes and seconds
-            duration: convertDuration(data.contentDetails.duration),
+            duration: convertDuration(data.contentDetails.duration)[0],
         }
-    } else if (data.target === "soundcloud") {
-        return {
+        return ret_val
+    } else if (query.target === "soundcloud") {
+        const ret_val: VidData = {
             target: "soundcloud",
             title: data.title,
             artist: data.user.username,
             description: data.description,
             thumbnail: {
                 url: data.artwork_url,
-                width: 50,
-                height: 50,
+                width: 0,
+                height: 0,
             },
             url: data.permalink_url,
+            duration: convertDuration(data.duration)[0],
         }
-    } else if (data.target === "spotify") {
-        return {
+        return ret_val
+    } else if (query.target === "spotify") {
+        const ret_val: VidData = {
             target: "spotify",
             title: data.name,
             artist: data.artists[0].name,
-            description: data.album.name,
+            description: "",
             thumbnail: {
                 url: data.album.images[0].url,
-                width: data.album.images[0].width / 2,
-                height: data.album.images[0].height / 2,
+                width: data.album.images[0].width,
+                height: data.album.images[0].height,
             },
             url: data.external_urls.spotify,
+            duration: convertDuration(data.duration_ms)[0],
         }
+        return ret_val
     } else {
-        return {
-            target: "youtube",
-            title: data.snippet.title,
-            artist: data.snippet.channelTitle,
-            description: data.snippet.description,
-            thumbnail: {
-                url: data.snippet.thumbnails.high.url,
-                width: data.snippet.thumbnails.high.width / 2,
-                height: data.snippet.thumbnails.high.height / 2,
-            },
-            url: "https://www.youtube.com/watch?v=" + data.id.videoId,
-        }
+        throw new Error("Invalid target")
     }
 }
+
 
 // convert ISO 8601 duration into hours:minutes:seconds
 function convertDuration(duration) {
@@ -241,9 +275,9 @@ function convertDuration(duration) {
     var seconds: number
     try { seconds = duration.match(/(\d+)S/)[1] } catch (e) { seconds = 0 }
 
-    
 
-    return ([`${hours}h${minutes}m${seconds}s`, [hours, minutes, seconds]])
+
+    return ([`${hours}h${minutes}m${seconds}s` /* , [hours, minutes, seconds] */])
 }
 
 // query the database at localhost:8000
@@ -254,3 +288,11 @@ async function searchDatabase(query) {
     const json = await res.json()
     return json
 }
+
+export {
+    queryAPIs,
+    searchDatabase,
+    queryYoutube,
+}
+
+export type { VidData }

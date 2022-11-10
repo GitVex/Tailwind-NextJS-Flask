@@ -1,5 +1,6 @@
 import React from 'react'
 import Image from 'next/image'
+import VideoContainer from '../videoContainers/VideoContainer.tsx'
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { useUser } from '@auth0/nextjs-auth0'
@@ -9,7 +10,7 @@ function BrowserContainer(prop) {
     const [expand, setExpand] = useState(false)
     const [delayedExpand, setDelayedExpand] = useState(false)
     const [ResponseData, setResponseData] = useState(null)
-    const data = JSON.parse(prop.trackData)
+    const data = prop.trackData
 
     const { user, error, isLoading } = useUser();
 
@@ -54,6 +55,7 @@ function BrowserContainer(prop) {
 
         // fetch the data from the django rest api and handle NetworkError
         try {
+            setResponseData('awaiting response')
             const response = await fetch('http://localhost:8000/api/track/', requestOptions)
             const data = await response.json()
             setResponseData(data)
@@ -87,8 +89,9 @@ function BrowserContainer(prop) {
                             <p className='text-navy-sierra-200 text-opacity-30'>{data.duration[0]}</p>
                         </span>
                         <span className='m-2'>
-                            <motion.div whileHover={{ y: -5 }} className='w-fit' onClick={ /* open link in a new tab */ () => window.open(data.url, '_blank')}>
-                                <Image src={data.thumbnail.url} height={data.thumbnail.height} width={data.thumbnail.width} className="rounded-xl cursor-pointer" />
+                            <motion.div whileHover={{ y: -5 }} className='w-fit scale-50' onClick={ /* open link in a new tab */ () => window.open(data.url, '_blank')}>
+                                {/* <Image src={data.thumbnail.url} height={data.thumbnail.height} width={data.thumbnail.width} className="rounded-xl cursor-pointer" /> */}
+                                <VideoContainer propData={data} />
                             </motion.div>
                         </span>
                         <span className='place-self-end m-2 flex flex-row place-items-center gap-2'>
