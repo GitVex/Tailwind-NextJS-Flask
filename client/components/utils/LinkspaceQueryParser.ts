@@ -172,9 +172,7 @@ async function queryYoutube(query: ValidatedQuery) {
 // query soundcloud
 async function querySoundcloud(query: ValidatedQuery) {
     const res = await fetch(
-        "https://api.soundcloud.com/resolve?url=" +
-        url +
-        "&client_id=2t9loNQH90kzJcsFCODdigxfp325aq4z" //+ process.env.SOUNDCLOUD_API_KEY
+        `https://api.soundcloud.com/resolve?url=${query.url}&client_id=2t9loNQH90kzJcsFCODdigxfp325aq4z${process.env.SOUNDCLOUD_API_KEY}`
     )
     const json = await res.json()
 
@@ -187,7 +185,7 @@ async function querySoundcloud(query: ValidatedQuery) {
 // query spotify
 async function querySpotify(query: ValidatedQuery) {
     const res = await fetch(
-        "https://api.spotify.com/v1/tracks/" + url.split("/")[4],
+        `https://api.spotify.com/v1/tracks/${query.url.split("/")[4]}`,
         {
             headers: {
                 Authorization: "Bearer " + process.env.SPOTIFY_ACCESS_TOKEN,
