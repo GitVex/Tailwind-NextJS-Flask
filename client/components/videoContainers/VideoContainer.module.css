@@ -1,3 +1,3 @@
-.boxShadow {
+.boxShadow > img {
     mask-image: linear-gradient(black 60%,transparent 90%);
 }

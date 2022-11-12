@@ -1,5 +1,16 @@
-// Language: typescript
-
+/**
+ * 
+ * This interface is used to unify the results of the three APIs of ``Spotify``, ``Soundcloud`` and ``Youtube``
+ * 
+ * @property {string} query -> the ``query`` that was used to search for the result
+ * @property {string} target -> the ``target`` of the query, either "youtube", "soundcloud", "spotify" or "phrase"
+ * @property {string} id -> the ``id`` of the track on the target platform
+ * @property {string} title -> the ``title`` of the track
+ * @property {string} artist -> the ``artist`` of the track
+ * @property {string} thumbnail -> the ``thumbnail`` of the track, contains the ``url``, ``width`` and ``height``
+ * @property {string} duration -> the ``duration`` of the track in a ``DDMMSS`` format
+ * @property {string} url -> the ``url`` of the track on the target platform
+ */
 interface VidData {
     target: string;
     title: string;
@@ -14,6 +25,15 @@ interface VidData {
     duration: string;
 }
 
+/**
+ * 
+ * An interface for providing continuous information through the ``Linkspace`` application
+ * 
+ * @property {string} target -> the ``target`` of the query, either "youtube", "soundcloud" or "spotify"
+ * @property {string} url -> the ``url`` of the track. *If the target is "phrase", this is not a url but the ``query`` string*
+ * @property {any} fetched -> this is the data that is collected from the target ``API``.
+ *  
+ */
 interface ValidatedQuery {
     target: string;
     url: string;
@@ -50,8 +70,6 @@ function validateQuery(query): ValidatedQuery {
 function queryAPIs(query) {
 
     const validatedQuery = validateQuery(query)
-
-    console.log(validatedQuery)
 
     if (validatedQuery.target === "soundcloud") {
         return querySoundcloud(validatedQuery)
@@ -91,8 +109,9 @@ async function fetchYoutube(id) {
 
 // search youtube with a given query and return the first 10 results and no channels
 async function searchYoutube(query: ValidatedQuery) {
+
     const searchRes = await fetch(
-        `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=10&q=${query}&type=video&key=${process.env.NEXT_PUBLIC_YOUTUBE_API_KEY}`
+        `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=10&q=${query.url}&type=video&key=${process.env.NEXT_PUBLIC_YOUTUBE_API_KEY}`
     )
     const searched = await searchRes.json()
 
@@ -157,13 +176,12 @@ async function queryYoutube(query: ValidatedQuery) {
 
     const json = {
         snippet: jsonSnippet.items[0].snippet,
+        id: jsonSnippet.items[0].id,
         contentDetails: jsonCDetails.items[0].contentDetails
     }
 
     query.target = "youtube"
     query.fetched = json
-
-    console.log(json)
 
     // TODO load video data into interface
     return [await loadInterface(query)]
@@ -206,7 +224,6 @@ async function querySpotify(query: ValidatedQuery) {
 function loadInterface(query: ValidatedQuery): VidData {
 
     const data = query.fetched
-    console.log(query.target)
 
     if (query.target === "youtube") {
         const ret_val: VidData = {

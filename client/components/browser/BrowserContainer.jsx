@@ -64,6 +64,8 @@ function BrowserContainer(prop) {
         }
     }
 
+    console.log(`data for ${data.title} is `, data)
+
     return (
         <>
             <div onClick={() => setExpand(!expand)} className="text-navy-sierra-100 bg-darknavy-800/50 p-1 rounded-md flex flex-row">
@@ -80,18 +82,17 @@ function BrowserContainer(prop) {
                     </svg>
                 </motion.button>
             </div>
-            <motion.div className='text-navy-sierra-100 bg-darknavy-800/40 p-1 rounded-md' animate={expand ? { opacity: 1, height: 350 } : { opacity: 0, height: 0 }}>
+            <motion.div className='text-navy-sierra-100 bg-darknavy-800/40 rounded-md' animate={expand ? { opacity: 1, height: 350 } : { opacity: 0, height: 0 }}>
                 {expand || delayedExpand ?
                     <div className='flex flex-col h-[350px]'>
                         <span className='flex flex-row gap-2 items-end m-2'>
                             <p className='text-2xl'>{data.title.length > 50 ? data.title.slice(0, 47) + " ..." : data.title}</p>
                             <p className='text-navy-sierra-200 text-opacity-30'>{data.url}</p>
-                            <p className='text-navy-sierra-200 text-opacity-30'>{data.duration[0]}</p>
+                            <p className='text-navy-sierra-200 text-opacity-30'>{data.duration}</p>
                         </span>
                         <span className='m-2'>
-                            <motion.div whileHover={{ y: -5 }} className='w-fit scale-50' onClick={ /* open link in a new tab */ () => window.open(data.url, '_blank')}>
-                                {/* <Image src={data.thumbnail.url} height={data.thumbnail.height} width={data.thumbnail.width} className="rounded-xl cursor-pointer" /> */}
-                                <VideoContainer propData={data} />
+                            <motion.div whileHover={{ y: -5 }} className='h-fit w-fit'>
+                                <VideoContainer propData={data} scale={.5}/>
                             </motion.div>
                         </span>
                         <span className='place-self-end m-2 flex flex-row place-items-center gap-2'>
