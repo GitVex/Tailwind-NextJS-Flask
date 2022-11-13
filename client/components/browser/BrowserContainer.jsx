@@ -84,19 +84,21 @@ function BrowserContainer(prop) {
             </div>
             <motion.div className='text-navy-sierra-100 bg-darknavy-800/40 rounded-md' animate={expand ? { opacity: 1, height: 350 } : { opacity: 0, height: 0 }}>
                 {expand || delayedExpand ?
-                    <div className='flex flex-col h-[350px]'>
-                        <span className='flex flex-row gap-2 items-end m-2'>
+                    <div className='grid grid-cols-[5fr_1fr_1fr] grid-rows-[auto_2fr_1fr] gap-2 m-2 h-[350px]'>
+                        <span className='flex flex-row gap-2 self-start items-end h-fit'>
                             <p className='text-2xl'>{data.title.length > 50 ? data.title.slice(0, 47) + " ..." : data.title}</p>
                             <p className='text-navy-sierra-200 text-opacity-30'>{data.url}</p>
                             <p className='text-navy-sierra-200 text-opacity-30'>{data.duration}</p>
                         </span>
-                        <span className='m-2'>
+                        <div className='place-self-center h-16 w-32 bg-darknavy-700/50'></div>
+                        <div className='place-self-center h-16 w-32 bg-darknavy-700/50'></div>
+                        <span className='flex flex-row items-center row-start-2'>
                             <motion.div whileHover={{ y: -5 }} className='h-fit w-fit'>
-                                <VideoContainer propData={data} scale={.5}/>
+                                <VideoContainer propData={data} scale={.5} />
                             </motion.div>
                         </span>
-                        <span className='place-self-end m-2 flex flex-row place-items-center gap-2'>
-                            <motion.button disabled={isLoading || !user} className={isLoading || !user ? 'rounded-md p-2 bg-darknavy-800 flex flex-row place-items-center gap-2 opacity-50' : 'rounded-md p-2 bg-darknavy-800 flex flex-row place-items-center gap-2'} whileHover={isLoading || !user ? {} : { scale: 1.05, y: -5 }} onClick={() => postToDatabase()}>
+                        <span className='place-self-center flex flex-row place-items-center gap-2 row-start-3 col-start-2'>
+                            <motion.button disabled={isLoading || !user} className={`rounded-md p-2 flex flex-row place-items-center gap-2 bg-darknavy-800 ${isLoading || !user ? "opacity-50" : null}`} whileHover={isLoading || !user ? {} : { scale: 1.05, y: -5 }} onClick={() => postToDatabase()}>
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                                 </svg>

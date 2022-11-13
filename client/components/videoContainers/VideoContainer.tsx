@@ -36,7 +36,7 @@ function VideoContainer(props) {
     }
 
     return (
-        <motion.div className={`${styles.boxShadow} cursor-pointer relative flex items-end justify-start bg-navy-sierra-100 dark:bg-black rounded-lg m-4`} whileHover={{ scale: 1.05 }} transition={{ duration: .1 }} onClick={() => window.open(data.url, '_blank')}>
+        <motion.div className={`${styles.boxShadow} cursor-pointer relative flex items-end justify-start bg-navy-sierra-100 dark:bg-black rounded-lg`} whileHover={{ scale: 1.05 }} transition={{ duration: .1 }} onClick={() => window.open(data.url, '_blank')}>
             <Image src={data.thumbnail.url} width={data.thumbnail.width * propScale} height={data.thumbnail.height * propScale} alt="Here should be the video thumbnail" />
             <motion.span className={`absolute flex flex-row px-4 z-2 items-center origin-bottom-left`} initial={{ scale: propScale }}>
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="w-16 h-16 fill-black dark:fill-navy-sierra-50">

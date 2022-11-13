@@ -13,7 +13,7 @@ import environ
 from functools import wraps
 import jwt
 from django.http import JsonResponse
-from .utils import track_anyl
+from .utils.track_anyl import track_anyl
 import json
 import logging
 
@@ -103,14 +103,24 @@ class trackViewSet(viewsets.ModelViewSet):
 
     # access data from the request and log it
     def create(self, request, *args, **kwargs):
+        # if the url is already in the database, return the data from the database
+        if track.objects.filter(url=request.data["url"]).exists():
+            track_obj = track.objects.get(url=request.data["url"])
+            serializer = trackSerializer(track_obj)
+            return JsonResponse(serializer.data, safe=False)
+
         # get the url from the request and generate the intensity array
         url = request.data.get("url")
+
         # if the duration is below 10 minutes, generate the intensity array
         duration = json.loads(request.data.get("duration"))
         duration = int(duration[0]) * 60 + int(duration[1])
         if duration <= 10:
             intensityArray = track_anyl.getIntensityArray(url)['intensityArray']
             request.data["intensityArray"] = intensityArray
+        else:
+            request.data["intensityArray"] = []
+        
 
         return super().create(request, *args, **kwargs)
 

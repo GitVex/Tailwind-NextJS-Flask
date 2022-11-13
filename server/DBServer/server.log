@@ -1,0 +1,14 @@
+12:46:12,898 environ.environ INFO C:\programming\Tailwind-NextJS-Flask\server\DBServer\database\.env doesn't exist - if you're not configuring your environment separately, create one.
+12:46:16,909 MARKDOWN DEBUG Successfully imported extension module "markdown.extensions.toc".
+12:46:16,910 MARKDOWN DEBUG Successfully loaded extension "markdown.extensions.toc.TocExtension".
+12:46:17,714 django.request WARNING Not Found: /favicon.ico
+14:37:27,771 django.utils.autoreload INFO C:\programming\Tailwind-NextJS-Flask\server\DBServer\database\views.py changed, reloading.
+14:37:35,928 environ.environ INFO C:\programming\Tailwind-NextJS-Flask\server\DBServer\database\.env doesn't exist - if you're not configuring your environment separately, create one.
+14:37:40,183 django.utils.autoreload INFO C:\programming\Tailwind-NextJS-Flask\server\DBServer\database\views.py changed, reloading.
+14:37:59,81 environ.environ INFO C:\programming\Tailwind-NextJS-Flask\server\DBServer\database\.env doesn't exist - if you're not configuring your environment separately, create one.
+14:39:10,357 django.utils.autoreload INFO C:\programming\Tailwind-NextJS-Flask\server\DBServer\database\views.py changed, reloading.
+14:39:16,925 environ.environ INFO C:\programming\Tailwind-NextJS-Flask\server\DBServer\database\.env doesn't exist - if you're not configuring your environment separately, create one.
+14:39:24,398 django.utils.autoreload INFO C:\programming\Tailwind-NextJS-Flask\server\DBServer\database\views.py changed, reloading.
+14:39:30,713 environ.environ INFO C:\programming\Tailwind-NextJS-Flask\server\DBServer\database\.env doesn't exist - if you're not configuring your environment separately, create one.
+14:39:39,478 django.utils.autoreload INFO C:\programming\Tailwind-NextJS-Flask\server\DBServer\database\views.py changed, reloading.
+14:39:45,853 environ.environ INFO C:\programming\Tailwind-NextJS-Flask\server\DBServer\database\.env doesn't exist - if you're not configuring your environment separately, create one.
