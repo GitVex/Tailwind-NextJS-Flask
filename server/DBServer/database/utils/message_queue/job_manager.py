@@ -10,28 +10,57 @@ import zmq
 
 from models import preset, tag, track
 
-
 # create a job datatype to store the information of a job
 # When a job object is created, it spawns a new process to run the job
 class Job:
-    def __init__(self, job_url, job_id = uuid.uuid4().hex):
+    def __init__(self, job_url, job_id=uuid.uuid4().hex):
         self.job_url = job_url
         self.job_id = job_id
         self.job_status = "waiting"
         self.job_result = None
         self.run(self)
-    
+
+    def serialize(self):
+        return json.dumps(
+            {
+                "job_url": self.job_url,
+                "job_id": self.job_id,
+                "job_status": self.job_status,
+                "job_result": self.job_result,
+            }
+        )
+
+    # load a Job object from a serelized json
+    @classmethod
+    def load(cls, serialized_job):
+        job_dict = json.loads(serialized_job)
+        job = cls(job_dict["job_url"], job_dict["job_id"])
+        job.job_status = job_dict["job_status"]
+        job.job_result = job_dict["job_result"]
+        return job
+
+    @classmethod
+    def __str__(self):
+        return (
+            f"Job({self.job_url}, {self.job_id}, {self.job_status}, {self.job_result})"
+        )
+
+    @staticmethod
     def __repr__(self):
         return f"Job({self.job_url}, {self.job_id})"
 
     def run(self):
-        self.job_status = "running"
+        self.job_status: str = "running"
         # run the job
         # the job is run in a subprocess
         # the subprocess is created with the job_url as the argument
         # the subprocess will return the result of the job as a json string
         # the result is then stored in the job_result attribute
-        self.job_process = subprocess.Popen([sys.executable, "job.py", self.job_url, self.job_id], stdout=subprocess.PIPE)
+        self.job_process = subprocess.Popen(
+            [sys.executable, "job.py", self.job_url, self.job_id]
+        )
+        # return the pid of the subprocess
+        return self.job_process.pid
 
     # method to save the result of the job to the django database
     # the result is assigned using the job_url
@@ -41,7 +70,6 @@ class Job:
             track_obj = track.objects.get(url=self.job_url)
             track_obj.intensityArray = self.job_result
             track_obj.save()
-    
 
 # create a job manager to manage the jobs
 # the job manager is a singleton class
@@ -60,8 +88,12 @@ class JobManager:
         self.sink_thread = threading.Thread(target=self.sink_listener)
         self.sink_thread.start()
 
+        # run the check_jobs method at an 1 hour interval
+        self.check_jobs_thread = threading.Thread(target=self.check_jobs)
+        self.check_jobs_thread.start()
+
     def __repr__(self):
-        return f"JobManager({self.jobs})"
+        return f"JobManager({[i.__str__() for i in self.jobs]})"
 
     def sink_listener(self):
         # listen for messages from the sink
@@ -77,7 +109,6 @@ class JobManager:
                 self.jobs[job_id].job_process.kill()
                 self.jobs[job_id].job_process.wait()
                 self.jobs[job_id].dunk()
-                del self.jobs[job_id]
 
     def create_job(self, job_url):
         # create a new job and add it to the jobs dictionary
@@ -107,4 +138,14 @@ class JobManager:
         else:
             return None
 
-    
+    # create a method that runs at an interval to check the status of the jobs, and remove the jobs that have finished
+    def check_jobs(self):
+
+        deleted_jobs = []
+
+        for job_id in self.jobs:
+            if self.jobs[job_id].job_status == "finished":
+                deleted_jobs.append(job_id)
+                del self.jobs[job_id]
+
+        return deleted_jobs

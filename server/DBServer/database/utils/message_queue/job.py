@@ -1,17 +1,15 @@
-import sys, zmq
+import sys, zmq, json
+from job_manager import Job
 
-# get the information from the command line
-# the first argument is the url of the track
-# the second argument is the id of the job
-job_url = sys.argv[1]
-job_id = sys.argv[2]
+# deserialize the job from the command line argument
+
 
 # create sockets to communicate with the sink and ventilator
 sinkSub = zmq.Context().socket(zmq.SUB)
 sinkSub.connect("tcp://localhost:5901") 
 
 vent = zmq.Context().socket(zmq.REQ)
-vent.connect("tcp://localhost:5001")
+vent.connect("tcp://localhost:5002")
 
 # subscribe to the sink
 sinkSub.setsockopt_string(zmq.SUBSCRIBE, "")
